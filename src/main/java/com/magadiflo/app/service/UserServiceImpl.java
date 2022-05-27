@@ -17,7 +17,7 @@ import java.util.List;
  * se hará la inyección de dependencia.
  * NOTA: Recordar que en otros tutoriales, se usa el @Autowired
  */
-@Slf4j
+@Slf4j //Proporciona la variable estática log
 @Transactional
 @RequiredArgsConstructor
 @Service
@@ -29,21 +29,25 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public List<User> getUsers() {
+        log.info("Fetching all users");
         return this.userRepository.findAll();
     }
 
     @Override
     public User getUser(String username) {
+        log.info("Fetching user {}", username);
         return this.userRepository.findByUsername(username);
     }
 
     @Override
     public User saveUser(User user) {
+        log.info("Saving new user {} to the database", user.getName());
         return this.userRepository.save(user);
     }
 
     @Override
     public Role saveRole(Role role) {
+        log.info("Saving new role {} to the database", role.getName());
         return this.rolRepository.save(role);
     }
 
@@ -55,6 +59,7 @@ public class UserServiceImpl implements IUserService {
      */
     @Override
     public void addRoleToUser(String username, String roleName) {
+        log.info("Adding role {} to user {}", roleName, username);
         User user = this.userRepository.findByUsername(username);
         Role role = this.rolRepository.findByName(roleName);
 
