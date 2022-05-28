@@ -6,10 +6,16 @@ import com.magadiflo.app.repository.IRolRepository;
 import com.magadiflo.app.repository.IUserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @RequiredArgsConstructor, Lombok creará un constructor cuyos argumentos serán
@@ -21,11 +27,30 @@ import java.util.List;
 @Transactional
 @RequiredArgsConstructor
 @Service
-public class UserServiceImpl implements IUserService {
+public class UserServiceImpl implements IUserService, UserDetailsService {
 
     private final IUserRepository userRepository;
 
     private final IRolRepository rolRepository;
+
+    //Método que usa Spring para cargar los usuarios desde la BD o desde donde sea que estén
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = this.userRepository.findByUsername(username);
+        if(user == null){
+            log.error("User {} not found in the database", username);
+            throw new UsernameNotFoundException("User not found in the database");
+        } else {
+            log.info("User {} found in the database", username);
+        }
+
+        Collection<SimpleGrantedAuthority> authorities = user.getRoles().stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
+
+        //ingresamos el nombre calificado completo para poder diferenciarnos
+        //del nuestra propia clase User usada en este servicio
+        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
+    }
 
     @Override
     public List<User> getUsers() {
