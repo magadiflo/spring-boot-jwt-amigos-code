@@ -1,11 +1,15 @@
 package com.magadiflo.app.security;
 
+import com.magadiflo.app.filter.CustomAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -48,9 +52,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         auth.userDetailsService(this.userDetailsService).passwordEncoder(this.bCryptPasswordEncoder);
     }
 
+    //Configuración de la seguridad Global del sistema
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        super.configure(http);
+        http.csrf().disable(); //Deshabilitamos la falsificación de solicitudes entre sitios porque no estamos trabajando con formularios
+        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);//No estamos trabajando con sesiones que es como se trabaja cuando en el servidor se renderizan las vistas
+        http.authorizeRequests().anyRequest().permitAll(); //Autorice las solicitudes y a cualquier solicitud que permita a todos
+        //Agregamos un filtro de autenticación para poder verificar al usuario cada vez que intenta iniciar sesión
+        http.addFilter(new CustomAuthenticationFilter(this.authenticationManager()));
+    }
+
+    @Override
+    @Bean
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
     }
 }
 /**
