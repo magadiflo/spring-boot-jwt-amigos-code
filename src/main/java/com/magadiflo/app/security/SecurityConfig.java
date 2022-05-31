@@ -1,6 +1,7 @@
 package com.magadiflo.app.security;
 
 import com.magadiflo.app.filter.CustomAuthenticationFilter;
+import com.magadiflo.app.filter.CustomAuthorizationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +14,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * @RequiredArgsConstructor, Creará un constructor para nosotros sobre la marcha y luego inyectará
@@ -69,6 +71,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests().anyRequest().authenticated(); //Autorice las solicitudes y que esté autenticado
         //Agregamos un filtro de autenticación para poder verificar al usuario cada vez que intenta iniciar sesión
         http.addFilter(customAuthenticationFilter);
+
+        //Agregamos un filtro de autorización. Debemos asegurarnos que este filtro esté antes que los
+        //demás filtros porque debemos interceptar todas las solicitudes antes que cualquier otro.
+        //En el segundo parámetro se usa la clase UsernamePasswordAuthenticationFilter.class, ya que según entiendo,
+        //nuestro filtro (CustomAuthorizationFilter) debe estar antes de cualquier otro filtro, y esos otros filtros
+        //hereden de UsernamePasswordAuthenticationFilter, tal como lo hace el CustomAuthenticationFilter
+        http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 
     @Override
