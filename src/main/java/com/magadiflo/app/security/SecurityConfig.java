@@ -65,7 +65,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.csrf().disable(); //Deshabilitamos la falsificación de solicitudes entre sitios porque no estamos trabajando con formularios
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);//No estamos trabajando con sesiones que es como se trabaja cuando en el servidor se renderizan las vistas
-        http.authorizeRequests().antMatchers("/api/login/**").permitAll();
+        http.authorizeRequests().antMatchers("/api/login/**", "/api/token/refresh/**").permitAll();
         http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/users/**").hasAnyAuthority("ROLE_USER");
         http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/user/save/**").hasAnyAuthority("ROLE_ADMIN");
         http.authorizeRequests().anyRequest().authenticated(); //Autorice las solicitudes y que esté autenticado

@@ -35,7 +35,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         //Si el path es el del inicio de sesión (login), lo dejamos pasar, no necesitamos hacer nada, ya que
         //esto nos da a entender de que el usuario está tratando de iniciar sesión
-        if (request.getServletPath().equals("/api/login")) {
+        if (request.getServletPath().equals("/api/login") || request.getServletPath().equals("/api/token/refresh")) {
             filterChain.doFilter(request, response);//se pasa la solicitud al siguiente filtro en la cadena de filtros
         } else { //Verificamos si tiene una autorización y luego configurar al usuario como el usuario que inició sesión
             String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
