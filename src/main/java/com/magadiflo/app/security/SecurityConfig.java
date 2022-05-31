@@ -4,6 +4,7 @@ import com.magadiflo.app.filter.CustomAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -55,11 +56,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     //Configuración de la seguridad Global del sistema
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        //Creando nuestra propio path de login que por defecto en Spring es /login
+        CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(this.authenticationManager());
+        customAuthenticationFilter.setFilterProcessesUrl("/api/login");
+
+
         http.csrf().disable(); //Deshabilitamos la falsificación de solicitudes entre sitios porque no estamos trabajando con formularios
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);//No estamos trabajando con sesiones que es como se trabaja cuando en el servidor se renderizan las vistas
-        http.authorizeRequests().anyRequest().permitAll(); //Autorice las solicitudes y a cualquier solicitud que permita a todos
+        http.authorizeRequests().antMatchers("/api/login/**").permitAll();
+        http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/users/**").hasAnyAuthority("ROLE_USER");
+        http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/user/save/**").hasAnyAuthority("ROLE_ADMIN");
+        http.authorizeRequests().anyRequest().authenticated(); //Autorice las solicitudes y que esté autenticado
         //Agregamos un filtro de autenticación para poder verificar al usuario cada vez que intenta iniciar sesión
-        http.addFilter(new CustomAuthenticationFilter(this.authenticationManager()));
+        http.addFilter(customAuthenticationFilter);
     }
 
     @Override
