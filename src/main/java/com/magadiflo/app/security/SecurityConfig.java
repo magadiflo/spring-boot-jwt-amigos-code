@@ -72,11 +72,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         //Agregamos un filtro de autenticación para poder verificar al usuario cada vez que intenta iniciar sesión
         http.addFilter(customAuthenticationFilter);
 
-        //Agregamos un filtro de autorización. Debemos asegurarnos que este filtro esté antes que los
+        //Agregamos un filtro de autorización (CustomAuthorizationFilter).
+        //Debemos asegurarnos que este filtro esté antes que los
         //demás filtros porque debemos interceptar todas las solicitudes antes que cualquier otro.
-        //En el segundo parámetro se usa la clase UsernamePasswordAuthenticationFilter.class, ya que según entiendo,
-        //nuestro filtro (CustomAuthorizationFilter) debe estar antes de cualquier otro filtro, y esos otros filtros
-        //hereden de UsernamePasswordAuthenticationFilter, tal como lo hace el CustomAuthenticationFilter
+        //En el segundo parámetro se usa la clase UsernamePasswordAuthenticationFilter.class, y eso es
+        //porque nuestro filtro (CustomAuthorizationFilter) debe estar antes de él, esto ya que según la
+        //cadena de filtros de spring tendríamos los siguientes:
+        //.......
+        //CorsFilter
+        //.......
+        //UsernamePasswordAuthenticationFilter <----- Nuestro filtro debería estar antes de este filtro
+        //.......
+        //BasicAuthenticationFilter <--- Para la autenticación
+        //.......
+        //FilterSecurityInterceptor <--- Para la autorización
+        //.......
+        //La finalidad de ese filtro es verificar el token que se está pasando, si va bien crear manualmente el
+        //UsernamePasswordAuthenticationToken, y luego el SecurityContextHolder
         http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 
