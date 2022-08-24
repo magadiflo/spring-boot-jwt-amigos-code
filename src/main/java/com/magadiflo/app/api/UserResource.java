@@ -61,7 +61,7 @@ public class UserResource {
     @PostMapping("/role/addtouser")
     public ResponseEntity<?> addRoleToUser(@RequestBody RoleToUserFrom form) {
         this.userService.addRoleToUser(form.getUsername(), form.getRoleName());
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().build(); //Como no vamos a enviar respuesta en el body(), solo una respuesta de OK, llamamos al build() para que construya la respuesta
     }
 
     /**
