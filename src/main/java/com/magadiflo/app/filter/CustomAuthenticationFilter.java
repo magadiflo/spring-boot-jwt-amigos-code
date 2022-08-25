@@ -28,7 +28,8 @@ import java.util.stream.Collectors;
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     //Necesitamos traer el administrador de autenticación (AuthenticationManager)
-    //porque lo vamos a llamar para autenticar al usuario.
+    //porque lo vamos a llamar para autenticar al usuario. Este parámetro está siendo
+    //pasado por el constructor desde la clase SecurityConfig, ver el método configure(HttpSecurity http)
     private final AuthenticationManager authenticationManager;
 
     public CustomAuthenticationFilter(AuthenticationManager authenticationManager) {
