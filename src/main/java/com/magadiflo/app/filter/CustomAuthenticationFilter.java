@@ -73,14 +73,16 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
                 .withIssuer(request.getRequestURL().toString())
                 .sign(algorithm);
 
+        //**** Para enviar el access_token y refresh_token dentro de la cabecera de respuesta (Headers)
         //response.setHeader("access_token", access_token);
         //response.setHeader("refresh_token", refresh_token);
+
+
+        //**** Para enviar el access_token y refresh_token dentro del cuerpo de la respuesta (Body) en formato JSON
         Map<String, String> tokens = new HashMap<>();
         tokens.put("access_token", access_token);
         tokens.put("refresh_token", refresh_token);
-
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        //Esto devolverá el access_token y refresh_token dentro del cuerpo de la respuesta en formato JSON
-        new ObjectMapper().writeValue(response.getOutputStream(), tokens);
+        new ObjectMapper().writeValue(response.getOutputStream(), tokens); //Escribimos en el response el objeto tokens, lo devolverá en formato JSON
     }
 }
